@@ -1,0 +1,42 @@
+name: Automated Performance Testing
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  performance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create directories
+        run: mkdir -p results
+
+      - name: Run JMeter in Docker
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/test-plans:/test-plans \
+            -v ${{ github.workspace }}/config:/config \
+            -v ${{ github.workspace }}/scripts:/scripts \
+            -v ${{ github.workspace }}/results:/results \
+            justb4/jmeter:5.6.3 \
+            -n -t /test-plans/api-performance.jmx \
+            -p /config/test.properties \
+            -l /results/results.jtl \
+            -e -o /results/html-report \
+            -Jthreads=50 -Jrampup=120
+
+      - name: Check Performance Thresholds
+        run: |
+          chmod +x scripts/check-thresholds.sh
+          scripts/check-thresholds.sh results/results.jtl
+
+      - name: Upload Performance Report
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-report
+          path: results/html-report/
