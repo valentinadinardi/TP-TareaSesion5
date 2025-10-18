@@ -25,7 +25,7 @@ jobs:
             -v ${{ github.workspace }}/config:/config \
             -v ${{ github.workspace }}/scripts:/scripts \
             -v ${{ github.workspace }}/results:/results \
-            justb4/jmeter:5.6.3 \
+            justb4/jmeter:latest \
             -n -t /test-plans/api-performance.jmx \
             -p /config/test.properties \
             -l /results/results.jtl \
