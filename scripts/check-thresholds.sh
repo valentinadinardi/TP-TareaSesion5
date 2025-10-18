@@ -10,7 +10,7 @@ THRESHOLD_P95=500  # Tiempo P95 en milisegundos
 THRESHOLD_ERROR_RATE=1.0  # Tasa de error en porcentaje
 
 # Calcular P95 de los tiempos de respuesta (columna 2: elapsed)
-P95_TIME=$(awk -F',' 'NR>1 {times[NR-1]=$2} END {asort(times); idx = int((NR-1)*0.95); print times[idx]}' "$RESULTS_FILE")
+P95_TIME=$(awk -F',' 'NR>1{print $2}' "$RESULTS_FILE" | sort -n | awk 'NF{a[NR]=$1} END{idx=int(NR*0.95); if(idx<1) idx=1; if(idx>NR) idx=NR; print a[idx]}')
 
 # Calcular tasa de error (columna 8: success = "true" o "false")
 ERROR_RATE=$(awk -F',' 'NR>1 {total++; if($8 != "true") errors++} END {if (total > 0) print (errors/total)*100; else print 0}' "$RESULTS_FILE")
