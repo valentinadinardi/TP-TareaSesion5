@@ -12,6 +12,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Pull Docker Image
+        run: docker pull justb4/jmeter:latest
+
       - name: Create directories
         run: mkdir -p results
 
@@ -40,3 +43,10 @@ jobs:
         with:
           name: performance-report
           path: results/html-report/
+
+      - name: Upload JMeter Log (for debugging)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jmeter-log
+          path: jmeter.log
